@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+  <head>
+    <base href="{{ request.scope.get('root_path', '') }}/">
+    <meta charset="utf-8">
+    <title>Admin - Certifications</title>
+    <link rel="stylesheet" href="static/site.css">
+  </head>
+  <body class="container">
+    <header class="topbar">
+      <div>
+        <h1>Certifications</h1>
+        <div class="muted">Add and manage certification types</div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <a class="btn" style="background:#374151;" href="admin">Dashboard</a>
+        <form method="post" action="admin/logout">
+          <button class="btn">Logout</button>
+        </form>
+      </div>
+    </header>
+
+    <div class="card">
+      <h2>Add certification</h2>
+      <form method="post" action="admin/certs/create">
+        <label>Code (unique)</label>
+        <input name="code" placeholder="SAFETY_LECTURE" required />
+        <div style="height:10px"></div>
+
+        <label>Title</label>
+        <input name="title" placeholder="Safety Lecture Certification" required />
+        <div style="height:10px"></div>
+
+        <label>Description (optional)</label>
+        <input name="description" placeholder="Basic shop safety lecture completion" />
+        <div style="height:10px"></div>
+
+        <button class="btn" type="submit">Create</button>
+      </form>
+
+      {% if error %}
+        <div class="alert" style="margin-top:12px;">{{ error }}</div>
+      {% endif %}
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h2>Existing certifications</h2>
+      {% if certs|length == 0 %}
+        <div class="muted">No certifications yet.</div>
+      {% else %}
+        <table style="width:100%; border-collapse:collapse;">
+          <tr style="text-align:left;">
+            <th style="padding:8px; border-bottom:1px solid var(--border);">Code</th>
+            <th style="padding:8px; border-bottom:1px solid var(--border);">Title</th>
+            <th style="padding:8px; border-bottom:1px solid var(--border);">Description</th>
+          </tr>
+          {% for c in certs %}
+            <tr>
+              <td style="padding:8px; border-bottom:1px solid var(--border);"><b>{{ c.code }}</b></td>
+              <td style="padding:8px; border-bottom:1px solid var(--border);">{{ c.title }}</td>
+              <td style="padding:8px; border-bottom:1px solid var(--border);">{{ c.description or '' }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% endif %}
+    </div>
+  </body>
+</html>
