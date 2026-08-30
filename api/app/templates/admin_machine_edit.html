@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+  <head>
+    <base href="{{ request.scope.get('root_path', '') }}/">
+    <meta charset="utf-8">
+    <title>Admin - Edit Machine</title>
+    <link rel="stylesheet" href="static/site.css">
+  </head>
+  <body class="container">
+    <header class="topbar">
+      <div>
+        <h1>Edit Machine</h1>
+        <div class="muted">Update machine info and required certifications</div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <a class="btn" style="background:#ededef;" href="admin/machines">Back</a>
+        <form method="post" action="admin/logout">
+          <button class="btn">Logout</button>
+        </form>
+      </div>
+    </header>
+
+    <div class="card">
+      <h2>Machine info</h2>
+      <form method="post" action="admin/machines/{{ machine.id }}/update">
+        <label>Name</label>
+        <input name="name" value="{{ machine.name }}" required />
+        <div style="height:10px"></div>
+
+        <label>Kiosk ID</label>
+        <input name="kiosk_id" value="{{ machine.kiosk_id }}" required />
+        <div style="height:10px"></div>
+
+        <label>Location</label>
+        <input name="location" value="{{ machine.location or '' }}" />
+        <div style="height:10px"></div>
+
+        <label>Status</label>
+        <select name="status">
+          <option value="active" {{ 'selected' if machine.status == 'active' else '' }}>active</option>
+          <option value="maintenance" {{ 'selected' if machine.status == 'maintenance' else '' }}>maintenance</option>
+          <option value="locked_out" {{ 'selected' if machine.status == 'locked_out' else '' }}>locked_out</option>
+        </select>
+
+        <div style="height:14px"></div>
+        <button class="btn" type="submit">Save</button>
+      </form>
+    
+      <hr style="margin:16px 0;">
+
+    <form method="post"
+      action="admin/machines/{{ machine.id }}/delete"
+      onsubmit="return confirm('Delete this machine permanently? This cannot be undone.');">
+    <button class="btn" type="submit" style="background:#b91c1c;">
+    Delete machine
+    </button>
+    </form>
+
+{% if delete_error %}
+  <div class="alert" style="margin-top:12px;">{{ delete_error }}</div>
+{% endif %}
+
+
+      {% if error %}
+        <div class="alert" style="margin-top:12px;">{{ error }}</div>
+      {% endif %}
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h2>Required certifications</h2>
+
+      {% if required|length == 0 %}
+        <div class="muted">No requirements set. Anyone active can use this machine.</div>
+      {% else %}
+        <ul>
+          {% for c in required %}
+            <li style="margin-bottom:8px;">
+              <b>{{ c.code }}</b> — {{ c.title }}
+              <form method="post" action="admin/machines/{{ machine.id }}/req/remove" style="display:inline;">
+                <input type="hidden" name="cert_id" value="{{ c.id }}">
+                <button class="btn" style="background:#b91c1c;" type="submit">Remove</button>
+              </form>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <hr style="margin:16px 0;">
+
+      <form method="post" action="admin/machines/{{ machine.id }}/req/add">
+        <label>Add requirement</label>
+        <select name="cert_id" required>
+          {% for c in all_certs %}
+            <option value="{{ c.id }}">{{ c.code }} — {{ c.title }}</option>
+          {% endfor %}
+        </select>
+        <button class="btn" type="submit">Add</button>
+      </form>
+    </div>
+  </body>
+</html>

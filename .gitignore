@@ -1,0 +1,8 @@
+.env
+*.sql
+*.sql.gz
+!database/bootstrap/001_schema.sql
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/

@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+  <head>
+    <base href="{{ request.scope.get('root_path', '') }}/">
+    <meta charset="utf-8">
+    <title>Allowed Machines</title>
+  </head>
+  <body style="font-family: sans-serif; max-width: 900px; margin: 40px auto;">
+    <h1>Allowed Machines</h1>
+
+    <p><b>User:</b> {{ user.full_name }} (barcode: {{ user.barcode_value }})</p>
+
+    {% if allowed_machines|length == 0 %}
+      <h2 style="color: #b00;">No machines available</h2>
+      <p>You may be missing required certifications, or machines are not active.</p>
+    {% else %}
+      <h2 style="color: #060;">You are approved for:</h2>
+      <ul>
+        {% for m in allowed_machines %}
+          <li><b>{{ m.name }}</b> — kiosk_id: {{ m.kiosk_id }}{% if m.location %} ({{ m.location }}){% endif %}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if blocked_machines|length > 0 %}
+      <hr style="margin: 24px 0;">
+      <h2>Not approved for:</h2>
+
+      {% for bm in blocked_machines %}
+        <div style="padding: 12px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 12px;">
+          <div><b>{{ bm.machine.name }}</b> — kiosk_id: {{ bm.machine.kiosk_id }}</div>
+          <div style="opacity: .8;">Missing certs: {{ bm.missing|join(", ") }}</div>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <hr style="margin: 24px 0;">
+    <a href="">Back</a>
+  </body>
+</html>
