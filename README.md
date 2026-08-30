@@ -26,7 +26,7 @@ personal preview branch -> personal preview website -> pull request -> main -> s
 | Devin | `NDPDA` | `preview/ndpda` | 8104 | `ndpda.riche10.com` |
 | Kyle | `KyleBurnsSchool` | `preview/kyleburnsschool` | 8105 | `kyleburnsschool.riche10.com` |
 | David | `davidpenrose` | `preview/davidpenrose` | 8106 | `davidpenrose.riche10.com` |
-| John | Pending | Pending | 8107 | Pending |
+| John | `jdjohnc1521` | `preview/jdjohnc1521` | 8107 | `jdjohnc1521.riche10.com` |
 
 ## Portainer deployment
 
