@@ -4,4 +4,5 @@ Name | GitHub Username
 -----|----------------
 Abel |     berhea1
 Kyle | KyleBurnsSchool
+John Dickson | jdjohnc1521
 Mingchuan Hu | M-ming519
