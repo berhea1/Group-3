@@ -3,3 +3,5 @@ Team Contributors
 Name | GitHub Username
 -----|----------------
 Abel Berhe | berhea1
+Kyle Burns | KyleBurnsSchool
+Mingchuan Hu | M-ming519
