@@ -95,6 +95,9 @@ def is_source_file(filename):
 # Otherwise they will all be reverted and you will have to re-create them
 # I would advise to create more than one token for repos with heavy commits
 lstTokens = []
+token = os.environ.get("GITHUB_TOKEN")
+if token:
+    lstTokens.append(token)
 
 dictFiles = dict()
 countfiles(dictFiles, lstTokens, repo)
