@@ -2,7 +2,7 @@ Team Contributors
 
 Name | GitHub Username
 -----|----------------
-Abel Berhe | berhea1
-Kyle Burns | KyleBurnsSchool
+Abel |     berhea1
+Kyle | KyleBurnsSchool
 Mingchuan Hu | M-ming519
-Omari |   riche10
+Omari Rich | riche10 
