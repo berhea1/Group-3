@@ -2,4 +2,4 @@ Team Contributors
 
 Name | GitHub Username
 -----|----------------
-Abel |     berhea1
+Abel Berhe | berhea1
