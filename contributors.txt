@@ -2,7 +2,6 @@ Team Contributors
 
 Name | GitHub Username
 -----|----------------
-Abel |     berhea1
-Kyle | KyleBurnsSchool
-John Dickson | jdjohnc1521
+Abel Berhe | berhea1
+Kyle Burns | KyleBurnsSchool
 Mingchuan Hu | M-ming519
