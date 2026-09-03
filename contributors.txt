@@ -1,9 +1,11 @@
 Team Contributors
 
-=======
 Name         | GitHub Username
 -------------|----------------
 Devin Allen  | NDPDA
-Abel Berhe   | berhea1
-Kyle Burns   | KyleBurnsSchool
+Abel Berhe | berhea1
+Kyle Burns | KyleBurnsSchool
+John Dickson | jdjohnc1521
 Mingchuan Hu | M-ming519
+David Penrose | davidpenrose
+Omari Rich | riche10
