@@ -15,3 +15,6 @@ node_modules
 /cypress/screenshots
 /cypress/videos
 /postgres-data
+
+# Personal editor settings
+/.vscode
