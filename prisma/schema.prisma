@@ -1,11 +1,15 @@
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL") // Ignore error, can't be changed until node ver is updated and prisma is upgraded to 7.10.0. It will work fine
 }
 
 generator client {
   provider = "prisma-client-js"
 }
+
+// ─────────────────────────────────────────────────────────────
+// Admin accounts (email + password login for /admin)
+// ─────────────────────────────────────────────────────────────
 
 model User {
   id    String @id @default(cuid())
@@ -14,8 +18,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  password Password?
-  notes    Note[]
+  password              Password?
+  awardedCertifications StudentCertification[]
+  awardedClasses        StudentClass[]
 }
 
 model Password {
@@ -25,14 +30,156 @@ model Password {
   userId String @unique
 }
 
-model Note {
-  id    String @id @default(cuid())
-  title String
-  body  String
+// ─────────────────────────────────────────────────────────────
+// Students & RebelCards
+// ─────────────────────────────────────────────────────────────
+
+/// A UNLV student. `nsheId` is the stable identifier and is what
+/// /results/<nsheId> keys on. `rebelCardId` is the number on the
+/// student's current physical card; it changes whenever a card is
+/// re-printed, so an admin simply overwrites it. It's optional because
+/// a student can be enrolled before they've been issued a card.
+model Student {
+  id          String @id @default(cuid())
+  nsheId      String @unique
+  rebelCardId String @unique
+  name        String
+  email       String @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String
+  certifications StudentCertification[]
+  classes        StudentClass[]
+  accessLogs     AccessLog[]
+}
+
+// ─────────────────────────────────────────────────────────────
+// Certifications & Classes
+// ─────────────────────────────────────────────────────────────
+
+/// A credential a student can hold (e.g. "Laser Cutter Safety & Operation").
+/// Machines gate access on these.
+model Certification {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  description String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  students         StudentCertification[]
+  requiredBy       MachineRequirement[]
+  awardedByClasses Class[]
+}
+
+/// Join table: which students hold which certifications, and when.
+model StudentCertification {
+  student         Student       @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  studentId       String
+  certification   Certification @relation(fields: [certificationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  certificationId String
+
+  completedAt DateTime @default(now())
+
+  /// Admin who recorded the award (kept if the admin is later deleted).
+  awardedBy   User?   @relation(fields: [awardedById], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  awardedById String?
+
+  @@id([studentId, certificationId])
+}
+
+/// A training class/course. Completing a class can optionally award a
+/// certification automatically.
+model Class {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  description String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  awardsCertification   Certification? @relation(fields: [awardsCertificationId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  awardsCertificationId String?
+
+  students StudentClass[]
+}
+
+/// Join table: which students completed which classes, and when.
+model StudentClass {
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  studentId String
+  class     Class   @relation(fields: [classId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  classId   String
+
+  completedAt DateTime @default(now())
+
+  awardedBy   User?   @relation(fields: [awardedById], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  awardedById String?
+
+  @@id([studentId, classId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Machines
+// ─────────────────────────────────────────────────────────────
+
+/// Grouping shown on the results page (3D Printing, CNC Machining, …).
+model MachineCategory {
+  id        String @id @default(cuid())
+  name      String @unique
+  sortOrder Int    @default(0)
+
+  machines Machine[]
+}
+
+/// A piece of equipment. A student is AUTHORIZED on a machine when they
+/// hold every certification in its `requirements`; a machine with no
+/// requirements is open to everyone.
+model Machine {
+  id       String  @id @default(cuid())
+  name     String  @unique
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  category   MachineCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  categoryId String
+
+  requirements MachineRequirement[]
+
+  @@index([categoryId])
+}
+
+/// Join table: certifications required to use a machine.
+model MachineRequirement {
+  machine         Machine       @relation(fields: [machineId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  machineId       String
+  certification   Certification @relation(fields: [certificationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  certificationId String
+
+  @@id([machineId, certificationId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Audit
+// ─────────────────────────────────────────────────────────────
+
+/// Every check-in scan, successful or not ("Access is logged per
+/// university policy"). `scannedValue` keeps the raw number entered so
+/// failed scans are still traceable; `student` is null when it didn't
+/// match anyone.
+model AccessLog {
+  id String @id @default(cuid())
+
+  scannedValue String
+  success      Boolean
+  scannedAt    DateTime @default(now())
+
+  student   Student? @relation(fields: [studentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  studentId String?
+
+  @@index([studentId, scannedAt])
+  @@index([scannedAt])
 }
