@@ -14,7 +14,7 @@
     "format:repo": "npm run format && npm run lint -- --fix",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "seed": "prisma db seed",
-    "setup": "prisma generate && prisma migrate deploy",
+    "setup": "prisma migrate deploy && prisma generate",
     "start": "cross-env NODE_ENV=production node ./build/server.js",
     "start:mocks": "cross-env NODE_ENV=production node --require ./mocks --require dotenv/config ./build/server.js",
     "test": "vitest",

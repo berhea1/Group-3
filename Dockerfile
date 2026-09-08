@@ -49,4 +49,12 @@ COPY --from=build /myapp/build /myapp/build
 COPY --from=build /myapp/public /myapp/public
 ADD . .
 
-CMD ["sh", "-c", "npm run setup && npm start"]
+# The Prisma client was already generated during the build stage above,
+# so only migrations run at startup. `prisma generate` must NOT run here:
+# it phones home to binaries.prisma.sh, which fails on hosts without
+# outbound internet (e.g. the Portainer box).
+# CHECKPOINT_DISABLE stops the Prisma CLI's update check, which is another
+# outbound request that would otherwise be attempted on every start.
+ENV CHECKPOINT_DISABLE=1
+
+CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
