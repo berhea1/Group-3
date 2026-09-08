@@ -13,7 +13,7 @@ import morgan from "morgan";
 import sourceMapSupport from "source-map-support";
 
 sourceMapSupport.install();
-installGlobals();
+installGlobals({ nativeFetch: true });
 run();
 
 async function run() {
