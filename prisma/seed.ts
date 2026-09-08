@@ -1,14 +1,17 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, type Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-async function seed() {
+// Startup runs this on every deployment/restart. Only create missing records;
+// preserve passwords, student edits, awards, and machine requirements.
+async function seed(prisma: Prisma.TransactionClient) {
   // ── Admin account ────────────────────────────────────────────
   const adminEmail = "admin@unlv.nevada.edu";
-  await prisma.user.deleteMany({ where: { email: adminEmail } });
-  const admin = await prisma.user.create({
-    data: {
+  const admin = await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {},
+    create: {
       email: adminEmail,
       password: { create: { hash: await bcrypt.hash("makerspace-admin", 10) } },
     },
@@ -124,22 +127,19 @@ async function seed() {
   for (const m of machines) {
     const category = await prisma.machineCategory.upsert({
       where: { name: m.category },
-      update: { sortOrder: m.sortOrder },
+      update: {},
       create: { name: m.category, sortOrder: m.sortOrder },
     });
-    const machine = await prisma.machine.upsert({
+    await prisma.machine.upsert({
       where: { name: m.name },
-      update: { categoryId: category.id },
-      create: { name: m.name, categoryId: category.id },
-    });
-    await prisma.machineRequirement.deleteMany({
-      where: { machineId: machine.id },
-    });
-    await prisma.machineRequirement.createMany({
-      data: m.requires.map((r) => ({
-        machineId: machine.id,
-        certificationId: certs[r].id,
-      })),
+      update: {},
+      create: {
+        name: m.name,
+        categoryId: category.id,
+        requirements: {
+          create: m.requires.map((r) => ({ certificationId: certs[r].id })),
+        },
+      },
     });
   }
 
@@ -183,43 +183,32 @@ async function seed() {
   ];
 
   for (const s of students) {
-    const student = await prisma.student.upsert({
+    await prisma.student.upsert({
       where: { nsheId: s.nsheId },
-      update: { name: s.name, email: s.email, rebelCardId: s.cardNumber },
+      update: {},
       create: {
         name: s.name,
         nsheId: s.nsheId,
         email: s.email,
         rebelCardId: s.cardNumber,
+        certifications: {
+          create: s.certs.map((c) => ({
+            certificationId: certs[c.name].id,
+            completedAt: new Date(c.completedAt),
+            awardedById: admin.id,
+          })),
+        },
       },
     });
-
-    for (const c of s.certs) {
-      await prisma.studentCertification.upsert({
-        where: {
-          studentId_certificationId: {
-            studentId: student.id,
-            certificationId: certs[c.name].id,
-          },
-        },
-        update: { completedAt: new Date(c.completedAt) },
-        create: {
-          studentId: student.id,
-          certificationId: certs[c.name].id,
-          completedAt: new Date(c.completedAt),
-          awardedById: admin.id,
-        },
-      });
-    }
   }
-
-  console.log(`Database has been seeded. 🌱`);
 }
 
-seed()
+prisma
+  .$transaction(seed, { timeout: 60_000 })
+  .then(() => console.log("Database has been seeded. 🌱"))
   .catch((e) => {
     console.error(e);
-    process.exit(1);
+    process.exitCode = 1;
   })
   .finally(async () => {
     await prisma.$disconnect();

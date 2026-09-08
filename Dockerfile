@@ -36,6 +36,8 @@ RUN npx prisma generate
 
 ADD . .
 RUN npm run build
+RUN ./node_modules/.bin/esbuild prisma/seed.ts \
+    --platform=node --format=cjs --outfile=build/seed.cjs
 
 # Finally, build the production image with minimal footprint
 FROM base
@@ -50,11 +52,11 @@ COPY --from=build /myapp/public /myapp/public
 ADD . .
 
 # The Prisma client was already generated during the build stage above,
-# so only migrations run at startup. `prisma generate` must NOT run here:
+# so migrations and the compiled seed run at startup. `prisma generate` must NOT run here:
 # it phones home to binaries.prisma.sh, which fails on hosts without
 # outbound internet (e.g. the Portainer box).
 # CHECKPOINT_DISABLE stops the Prisma CLI's update check, which is another
 # outbound request that would otherwise be attempted on every start.
 ENV CHECKPOINT_DISABLE=1
 
-CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
+CMD ["sh", "-c", "./node_modules/.bin/prisma migrate deploy && node build/seed.cjs && npm start"]
