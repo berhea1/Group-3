@@ -125,10 +125,10 @@ export default function ScanPage() {
             UNLV
           </div>
           <div
-            className="text-xl font-medium uppercase tracking-[0.3em] text-white/50"
+            className="text-xl font-medium uppercase tracking-[0.2em] text-white/50"
             style={{ fontFamily: "Oswald, sans-serif" }}
           >
-            Makerspace
+            College of Engineering Makerspace Access
           </div>
           <div
             className="mx-auto mt-3 h-px w-24"
