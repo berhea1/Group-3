@@ -242,6 +242,7 @@ class TestCounterEndpoints:
         assert isinstance(response.get_json()["count"], int)  
 
         # TODO: Add an assertion to check the exact count value
+        assert response.get_json()["count"] == 2
 
     # ===========================
     # Test: Retrieve counters with values greater than a threshold

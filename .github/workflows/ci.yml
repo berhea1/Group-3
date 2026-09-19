@@ -49,7 +49,9 @@ jobs:
       - name: Set Up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.9"  # Ensure consistency in Python version
+          cache: "pip"
+          cache-dependency-path: ci_lab/requirements.txt
 
       - name: Install Dependencies
         run: |
