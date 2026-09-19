@@ -59,6 +59,16 @@ jobs:
       - name: Run Tests with Pytest
         run: pytest -o addopts="--verbose"
 
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: ci_lab/coverage.xml
+          retention-days: 14
+          
+      - name: Install Flake8
+        run: pip install flake8
 
   coverage:
     runs-on: ubuntu-latest
