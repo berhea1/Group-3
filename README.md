@@ -2,6 +2,12 @@
 
 Shared senior-design project for the machine-shop access system.
 
+## Project origin
+
+This baseline was adapted from a prototype Omari Rich began before the Senior Design course. This pull request records the point where that pre-existing prototype enters the Group 3 Senior Design repository; it does not claim that all of the baseline code was created during the course.
+
+See [`docs/project-origin.md`](docs/project-origin.md) for the provenance and contribution boundary.
+
 ## What is included
 
 - FastAPI web application and administrator interface
