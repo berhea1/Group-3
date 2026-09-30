@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+  <head>
+    <base href="{{ request.scope.get('root_path', '') }}/">
+    <meta charset="utf-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="static/site.css">
+  </head>
+  <body class="container">
+    <header class="topbar">
+      <div>
+        <h1>Admin Dashboard</h1>
+        <div class="muted">Logged in as <b>{{ admin_name }}</b></div>
+      </div>
+      <form method="post" action="admin/logout">
+        <button class="btn">Logout</button>
+      </form>
+    </header>
+
+    <div class="card">
+      <h2>Admin actions</h2>
+      <ul>
+        <li><a href="admin/students">Students</a> (search, add, edit, grant certs)</li>
+        <li><a href="admin/machines">Machines</a> (add/edit, set required certs)</li>
+        <li><a href="admin/certs">Certifications</a> (create certs, manage)</li>
+      </ul>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h2>Quick links</h2>
+      <ul>
+        <li><a href="">Back to student lookup</a></li>
+      </ul>
+    </div>
+  </body>
+</html>

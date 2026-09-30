@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+  <head>
+    <base href="{{ request.scope.get('root_path', '') }}/">
+    <meta charset="utf-8">
+    <title>Admin - Machines</title>
+    <link rel="stylesheet" href="static/site.css">
+  </head>
+  <body class="container">
+    <header class="topbar">
+      <div>
+        <h1>Machines</h1>
+        <div class="muted">Add machines and edit requirements</div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <a class="btn" style="background:#ededef;" href="admin">Dashboard</a>
+        <form method="post" action="admin/logout">
+          <button class="btn">Logout</button>
+        </form>
+      </div>
+    </header>
+
+    <div class="card">
+      <h2>Add machine</h2>
+      <form method="post" action="admin/machines/create">
+        <label>Name</label>
+        <input name="name" placeholder="Mill #1" required />
+        <div style="height:10px"></div>
+
+        <label>Kiosk ID (unique)</label>
+        <input name="kiosk_id" placeholder="mill-01" required />
+        <div style="height:10px"></div>
+
+        <label>Location</label>
+        <input name="location" placeholder="Room A" />
+        <div style="height:10px"></div>
+
+        <button class="btn" type="submit">Create</button>
+      </form>
+
+      {% if error %}
+        <div class="alert" style="margin-top:12px;">{{ error }}</div>
+      {% endif %}
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h2>Existing machines</h2>
+      {% if machines|length == 0 %}
+        <div class="muted">No machines yet.</div>
+      {% else %}
+        <table style="width:100%; border-collapse:collapse;">
+          <tr style="text-align:left;">
+            <th style="padding:8px; border-bottom:1px solid var(--border);">Name</th>
+            <th style="padding:8px; border-bottom:1px solid var(--border);">Kiosk ID</th>
+            <th style="padding:8px; border-bottom:1px solid var(--border);">Location</th>
+            <th style="padding:8px; border-bottom:1px solid var(--border);">Status</th>
+            <th style="padding:8px; border-bottom:1px solid var(--border);">Action</th>
+          </tr>
+          {% for m in machines %}
+            <tr>
+              <td style="padding:8px; border-bottom:1px solid var(--border);">{{ m.name }}</td>
+              <td style="padding:8px; border-bottom:1px solid var(--border);">{{ m.kiosk_id }}</td>
+              <td style="padding:8px; border-bottom:1px solid var(--border);">{{ m.location or '' }}</td>
+              <td style="padding:8px; border-bottom:1px solid var(--border);">{{ m.status }}</td>
+              <td style="padding:8px; border-bottom:1px solid var(--border);">
+                <a href="admin/machines/{{ m.id }}">Edit</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% endif %}
+    </div>
+  </body>
+</html>

@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <base href="{{ request.scope.get('root_path', '') }}/">
+    <meta charset="utf-8">
+    <title>Shop System</title>
+  </head>
+  <body style="font-family: sans-serif; max-width: 720px; margin: 40px auto;">
+    <h1>Shop System</h1>
+
+    <p>Enter your Student ID / Barcode:</p>
+
+    <form method="post" action="check">
+      <input name="barcode"
+             autofocus
+             style="font-size: 22px; padding: 12px; width: 100%;"
+             placeholder="Scan or type barcode..." />
+      <button type="submit" style="margin-top: 12px; padding: 10px 14px; font-size: 16px;">
+        Continue
+      </button>
+    </form>
+
+    <hr style="margin: 24px 0;">
+
+    <p>
+      <a href="admin/login">Admin Login</a>
+    </p>
+  </body>
+</html>

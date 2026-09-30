@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+  <head>
+    <base href="{{ request.scope.get('root_path', '') }}/">
+    <meta charset="utf-8">
+    <title>Admin - Edit Student</title>
+    <link rel="stylesheet" href="static/site.css">
+  </head>
+  <body class="container">
+    <header class="topbar">
+      <div>
+        <h1>Edit Student</h1>
+        <div class="muted">Manage basic info + certifications</div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <a class="btn" style="background:#ededef;" href="admin/students">Back</a>
+        <form method="post" action="admin/logout">
+          <button class="btn">Logout</button>
+        </form>
+      </div>
+    </header>
+
+    <div class="card">
+      <h2>Student info</h2>
+      <form method="post" action="admin/students/{{ student.id }}/update">
+        <label>Full name</label>
+        <input name="full_name" value="{{ student.full_name }}" required />
+        <div style="height:10px"></div>
+
+        <label>Barcode</label>
+        <input name="barcode_value" value="{{ student.barcode_value }}" required />
+        <div style="height:10px"></div>
+
+        <label>Active</label>
+        <select name="is_active">
+          <option value="true" {{ 'selected' if student.is_active else '' }}>true</option>
+          <option value="false" {{ 'selected' if not student.is_active else '' }}>false</option>
+        </select>
+
+        <div style="height:14px"></div>
+        <button class="btn" type="submit">Save</button>
+      </form>
+
+    <hr style="margin:16px 0;">
+
+        <form method="post"
+        action="admin/students/{{ student.id }}/delete"
+        onsubmit="return confirm('Delete this student profile permanently? This cannot be undone.');">
+        <button class="btn" type="submit" style="background:#b91c1c;">
+      Delete student
+        </button>
+  </form>
+    </div>
+
+
+      {% if save_error %}
+        <div class="alert" style="margin-top:12px;">{{ save_error }}</div>
+      {% endif %}
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h2>Certifications</h2>
+
+      <div class="muted" style="margin-bottom:10px;">Currently granted:</div>
+      {% if granted|length == 0 %}
+        <div class="muted">None</div>
+      {% else %}
+        <ul>
+          {% for c in granted %}
+            <li style="margin-bottom:8px;">
+              <b>{{ c.code }}</b> — {{ c.title }}
+              <form method="post" action="admin/students/{{ student.id }}/certs/revoke" style="display:inline;">
+                <input type="hidden" name="cert_id" value="{{ c.id }}">
+                <button class="btn" style="background:#b91c1c;" type="submit">Revoke</button>
+              </form>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <hr style="margin:16px 0;">
+
+      <div class="muted" style="margin-bottom:10px;">Grant a certification:</div>
+      <form method="post" action="admin/students/{{ student.id }}/certs/grant">
+        <select name="cert_id" required>
+          {% for c in all_certs %}
+            <option value="{{ c.id }}">{{ c.code }} — {{ c.title }}</option>
+          {% endfor %}
+        </select>
+        <button class="btn" type="submit">Grant</button>
+      </form>
+
+      {% if cert_error %}
+        <div class="alert" style="margin-top:12px;">{{ cert_error }}</div>
+      {% endif %}
+    </div>
+  </body>
+</html>
